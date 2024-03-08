@@ -26,7 +26,7 @@ public class SecurityConfig {
         manager.createUser(User.withDefaultPasswordEncoder()
                 .username("Dmitry")
                 .password("Alekseev")
-                .roles("Employee", "HR").build());
+                .roles("Manager", "HR").build());
 
         return manager;
 
@@ -34,10 +34,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests(authorize -> authorize.anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults())
-                .httpBasic(Customizer.withDefaults());
+        http.authorizeRequests().requestMatchers("/").hasAnyRole("Employee", "HR", "Manager")
+                .requestMatchers("/hr_info").hasRole("HR")
+                .requestMatchers("/manager_info").hasRole("Manager")
+                .and().formLogin(formlogin -> formlogin.permitAll());
         return http.build();
     }
     }
